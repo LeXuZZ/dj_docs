@@ -26,10 +26,12 @@ SECRET_KEY = '$01+2um7!gy9q(#%53r^4t_bt(t0c2edqq59=&l2cfj5ar0ps_'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-#TEMPLATE_DEBUG = True
+if DEBUG:
+    from dj_docs.settings_dev import *
+else:
+    from dj_docs.settings_prod import *
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -40,10 +42,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Pipeline
     'pipeline',
-    # DRF
-    'rest_framework',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -59,16 +58,15 @@ ROOT_URLCONF = 'dj_docs.urls'
 
 WSGI_APPLICATION = 'dj_docs.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
@@ -83,18 +81,22 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
+
 STATIC_URL = '/static/'
 STATIC_ROOT = normpath(join(SITE_ROOT, 'static'))
-STATICFILES_DIRS = ()
 
 # Configure templates
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR,  'templates'),],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates'),
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -106,6 +108,8 @@ TEMPLATES = [
         },
     },
 ]
+
+X_FRAME_OPTIONS = 'DENY'
 
 # Django Pipeline (and browserify)
 STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
@@ -144,4 +148,3 @@ PIPELINE = {
         'output_filename': 'css/mysite_css.css',
     },
 }
-
