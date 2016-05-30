@@ -1,3 +1,5 @@
+import json
+
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.core.mail import send_mail
 from django.utils import timezone
@@ -5,7 +7,17 @@ from django.db import models
 
 
 class Poll(models.Model):
-    poll_file = models.FileField(upload_to='poll/surveys')
+    name = models.CharField(max_length=255)
+    json = models.TextField()
+
+    def __str__(self):
+        return self.name
+
+    def json_serialize(self):
+        return json.dumps({
+            'name': self.name,
+            'json': self.json
+        })
 
 
 class PollUserManager(BaseUserManager):
@@ -71,6 +83,30 @@ class PollUser(AbstractBaseUser, PermissionsMixin):
         """
         send_mail(subject, message, from_email, [self.email])
 
+    def json_serialize(self):
+        return json.dumps({
+            'email': self.email,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'middle_name': self.middle_name,
+            'full_name': self.get_full_name()
+        })
+
     class Meta:
         verbose_name = 'Користувачі'
         verbose_name_plural = 'Користувачі'
+
+
+class PollResult(models.Model):
+    user = models.ForeignKey(to=PollUser)
+    poll = models.ForeignKey(to=Poll)
+    poll_result = models.TextField()
+
+    def __str__(self):
+        return 'poll: %s. username: %s' % (self.poll.name, self.user.email)
+
+    def json_serialize(self):
+        return json.dumps({
+            'user': self.user.json_serialize(),
+            'poll': self.poll.json_serialize()
+        })

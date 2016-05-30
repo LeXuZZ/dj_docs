@@ -60,6 +60,7 @@ class RegisterView(View):
             'password': request.POST.get('password')
         })
         redis_instance.setex(registration_hash, REGISTRATION_EXPIRATION_TIME, registration_data)
+        redis_instance.publish('registration_email_channel', registration_data)
         return HttpResponse(response_message(success=True,
                                              text='email with registration link was send'))
 
