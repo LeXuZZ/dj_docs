@@ -43,6 +43,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'pipeline',
+    'poll',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -150,3 +151,11 @@ PIPELINE = {
 }
 
 REGISTRATION_EXPIRATION_TIME = 60 * 60 * 24 # 1 day
+
+AUTH_USER_MODEL = 'poll.PollUser'
+
+
+AUTHENTICATION_BACKENDS = (
+    'poll.auth.backends.PollAuthBackend',
+    'django.contrib.auth.backends.ModelBackend'
+)
