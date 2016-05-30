@@ -1,4 +1,5 @@
 import os
+import redis
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -14,3 +15,5 @@ DATABASES = {
         'PORT': '',  # '' means use default
     }
 }
+
+redis_instance = redis.Redis(unix_socket_path='/var/run/redis/redis.sock')

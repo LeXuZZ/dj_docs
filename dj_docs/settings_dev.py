@@ -1,4 +1,5 @@
 import os
+import redis
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -15,3 +16,11 @@ DATABASES = {
 }
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'static/img')
+
+REDIS_CONFIG = {
+    'host': 'localhost',
+    'port': 6379,
+    'db': 0
+}
+
+redis_instance = redis.StrictRedis(**REDIS_CONFIG)
