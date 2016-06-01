@@ -20,7 +20,7 @@ def response_message(success=False, data=None, **kwargs):
                                     'data': data,
                                     'message': {
                                         k: v for k, v in kwargs.items() if k in allowed_keys
-                                        }}))
+                                        }}), content_type="application/json")
 
 
 @ensure_csrf_cookie

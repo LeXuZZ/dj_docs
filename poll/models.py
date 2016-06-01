@@ -10,14 +10,21 @@ class Poll(models.Model):
     name = models.CharField(max_length=255)
     json = models.TextField()
 
-    def __str__(self):
-        return self.name
-
     def json_serialize(self):
         return json.dumps({
             'name': self.name,
             'json': self.json
         })
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        self.json\
+            .replace('\r', '')\
+            .replace('\n', '')
+        super().save()
+
+    def __str__(self):
+        return self.name
 
 
 class PollUserManager(BaseUserManager):
