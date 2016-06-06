@@ -28,6 +28,11 @@ def get_csrf(request):
     return HttpResponse("")
 
 
+class IndexView(View):
+    def get(self, request):
+        return render(request, 'index.html')
+
+
 class PollView(View):
     def get(self, request, id=None):
         if id:
@@ -46,11 +51,6 @@ class PollView(View):
             return response_message(success=True)
         except Exception:
             return response_message(success=False, error=True, text='cannot save poll to db')
-
-
-class IndexView(View):
-    def get(self, request):
-        return render(request, 'index.html')
 
 
 class LoginView(View):

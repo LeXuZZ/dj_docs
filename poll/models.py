@@ -18,9 +18,10 @@ class Poll(models.Model):
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
-        self.json\
+        self.json = self.json\
             .replace('\r', '')\
-            .replace('\n', '')
+            .replace('\n', '')\
+
         super().save()
 
     def __str__(self):
