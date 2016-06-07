@@ -52,20 +52,27 @@
 //ReactDOM.render(
 //    <ReactSurvey json={surveyJSON} onComplete={function(){}}/>,
 //    document.getElementById("surveyContainer"));
+
+define(function (require) {
+    var JSON5 = require('json5');
+});
+
 var jsonResponse,
     jsonData,
     json;
 
-var send = function (data) {
-    console.log(data);
+var send = function (survey) {
+    console.log(survey);
+	var resultAsString = JSON.stringify(survey.data);
+	alert(resultAsString); //send Ajax request to your web server.
 };
 
-fetch("http://127.0.0.1:8000/api/v1/poll/1/")
+fetch("http://128.199.51.34/api/v1/poll/1/")
     .then((response) => response.text())
     .then((responseText) => {
-        jsonResponse = JSON.parse(responseText);
-        jsonData = JSON.parse(jsonResponse.data);
-        json = JSON.parse(jsonData.json);
+        jsonResponse = JSON5.parse(responseText);
+        jsonData = JSON5.parse(jsonResponse.data);
+        json = JSON5.parse(jsonData.json);
         console.log(json);
 
         ReactDOM.render(
