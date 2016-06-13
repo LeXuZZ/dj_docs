@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.generic import View
@@ -54,20 +54,24 @@ class PollView(View):
 
 
 class LoginView(View):
+    def get(self, request):
+        return render(request, 'login.html')
+
     def post(self, request):
-        username = request.POST.get('username')
+        username = request.POST.get('email')
         password = request.POST.get('password')
         user = authenticate(username=username, password=password)
         if user is not None:
             if user.is_active:
                 login(request, user)
-                return response_message(success=True)
+                return redirect("/")
         return response_message(success=False,
                                 text='Невірно вказана пара логін\пароль',
                                 error=True)
 
 
 class RegisterView(View):
+
     def post(self, request):
 
         registration_hash = ''.join(
@@ -85,6 +89,9 @@ class RegisterView(View):
                                 text='email with registration link was send')
 
     def get(self, request, registration_hash):
+        if not registration_hash:
+            return render(request, 'register.html')
+
         try:
             registration_data = json.loads(redis_instance.get(registration_hash).decode())
         except AttributeError:
@@ -107,6 +114,6 @@ class RegisterView(View):
 
 
 class LogoutView(View):
-    def post(self, request):
+    def get(self, request):
         logout(request)
         return response_message(success=True)
