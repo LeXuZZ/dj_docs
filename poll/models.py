@@ -1,9 +1,7 @@
 import json
-
-from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
-from django.core.mail import send_mail
-from django.utils import timezone
 from django.db import models
+
+from poll_auth.models import PollUser
 
 
 class Poll(models.Model):

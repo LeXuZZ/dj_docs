@@ -1,58 +1,3 @@
-//var surveyJSON = {
-//    title: "Tell us, what technologies do you use?", pages: [
-//        {
-//            name: "page1", questions: [
-//            {
-//                type: "radiogroup",
-//                choices: ["Yes", "No"],
-//                isRequired: true,
-//                name: "frameworkUsing",
-//                title: "Do you use any front-end framework like Bootstrap?"
-//            },
-//            {
-//                type: "checkbox",
-//                choices: ["Bootstrap", "Foundation"],
-//                hasOther: true,
-//                isRequired: true,
-//                name: "framework",
-//                title: "What front-end framework do you use?",
-//                visible: false
-//            }
-//        ]
-//        },
-//        {
-//            name: "page2", questions: [
-//            {
-//                type: "radiogroup",
-//                choices: ["Yes", "No"],
-//                isRequired: true,
-//                name: "mvvmUsing",
-//                title: "Do you use any MVVM framework?"
-//            },
-//            {
-//                type: "checkbox",
-//                choices: ["AngularJS", "KnockoutJS", "React"],
-//                hasOther: true,
-//                isRequired: true,
-//                name: "mvvm",
-//                title: "What MVVM framework do you use?",
-//                visible: false
-//            }]
-//        },
-//        {
-//            name: "page3", questions: [
-//            {type: "comment", name: "about", title: "Please tell us about your main requirements for Survey library"}]
-//        }
-//    ],
-//    triggers: [
-//        {type: "visible", operator: "equal", value: "Yes", name: "frameworkUsing", questions: ["framework"]},
-//        {type: "visible", operator: "equal", value: "Yes", name: "mvvmUsing", questions: ["mvvm"]}
-//    ]
-//};
-//ReactDOM.render(
-//    <ReactSurvey json={surveyJSON} onComplete={function(){}}/>,
-//    document.getElementById("surveyContainer"));
-
 define(function (require) {
     var JSON5 = require('json5');
 });
@@ -61,19 +6,34 @@ var jsonResponse,
     jsonData,
     json;
 
+fetch("http://127.0.0.1:8000/api/v1/get_csrf_token/")
+    .then((response) => console.log(response));
+
 var send = function (survey) {
     console.log(survey);
-	var resultAsString = JSON.stringify(survey.data);
-	alert(resultAsString); //send Ajax request to your web server.
+
+    fetch("http://127.0.0.1:8000/api/v1/poll/", {
+        method: 'post',
+        credentials: "include",
+        headers: {
+            "Content-type": "application/json; charset=utf-8",
+            "X-CSRFToken": "Q3mX84SS0MiCpoXFJCP1OgIlBGaf0y8z"
+        },
+        body: survey
+    });
+    //console.log(survey);
+	//var resultAsString = JSON.stringify(survey.data);
+	//alert(resultAsString); //send Ajax request to your web server.
 };
 
-fetch("http://128.199.51.34/api/v1/poll/1/")
+
+fetch("http://127.0.0.1:8000/api/v1/poll/1/", {credentials: "include"})
     .then((response) => response.text())
     .then((responseText) => {
         jsonResponse = JSON5.parse(responseText);
         jsonData = JSON5.parse(jsonResponse.data);
         json = JSON5.parse(jsonData.json);
-        console.log(json);
+
 
         ReactDOM.render(
             <ReactSurvey json={json} onComplete={send}/>,

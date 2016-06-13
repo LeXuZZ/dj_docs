@@ -42,7 +42,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'pipeline',
+    'poll_auth',
     'poll',
 )
 
@@ -96,7 +96,8 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, 'templates'),
+            os.path.join(BASE_DIR, 'auth/templates'),
+            os.path.join(BASE_DIR, 'poll/templates'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -112,50 +113,12 @@ TEMPLATES = [
 
 X_FRAME_OPTIONS = 'DENY'
 
-# Django Pipeline (and browserify)
-STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
-
-STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'pipeline.finders.PipelineFinder',
-)
-
-# browserify-specific
-PIPELINE_COMPILERS = (
-    'pipeline_browserify.compiler.BrowserifyCompiler',
-)
-
-PIPELINE_CSS_COMPRESSOR = 'pipeline.compressors.NoopCompressor'
-PIPELINE_JS_COMPRESSOR = 'pipeline.compressors.uglifyjs.UglifyJSCompressor'
-
-if DEBUG:
-    PIPELINE_BROWSERIFY_ARGUMENTS = '-t babelify'
-
-PIPELINE = {
-    'mysite_js': {
-        'source_filenames': (
-            'js/bower_components/jquery/dist/jquery.min.js',
-            'js/bower_components/react/JSXTransformer.js',
-            'js/bower_components/react/react-with-addons.js',
-            'js/app.browserify.js',
-        ),
-        'output_filename': 'js/mysite_js.js',
-    },
-    'mysite_css': {
-        'source_filenames': (
-            'css/style.css',
-        ),
-        'output_filename': 'css/mysite_css.css',
-    },
-}
-
 REGISTRATION_EXPIRATION_TIME = 60 * 60 * 24 # 1 day
 
-AUTH_USER_MODEL = 'poll.PollUser'
+AUTH_USER_MODEL = 'poll_auth.PollUser'
 
 
 AUTHENTICATION_BACKENDS = (
-    'poll.auth.backends.PollAuthBackend',
+    'poll_auth.backends.PollAuthBackend',
     'django.contrib.auth.backends.ModelBackend'
 )
