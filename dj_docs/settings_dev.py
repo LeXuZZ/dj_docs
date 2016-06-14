@@ -3,6 +3,8 @@ import redis
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
+BASE_URL = "http://127.0.0.1:8000/"
+
 ALLOWED_HOSTS = []
 
 # Database

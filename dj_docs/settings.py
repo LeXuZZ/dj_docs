@@ -122,3 +122,17 @@ AUTHENTICATION_BACKENDS = (
     'poll_auth.backends.PollAuthBackend',
     'django.contrib.auth.backends.ModelBackend'
 )
+
+# Check redis
+try:
+    from redis.exceptions import ConnectionError
+    redis_instance.set("dummy", "dummy")
+except ConnectionError:
+    from django.core.exceptions import ImproperlyConfigured
+    raise ImproperlyConfigured("Redis is not available")
+
+
+SENDGRID_API_KEY = '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'
+
+SENDGRID_URL = "https://api.sendgrid.com/v3/mail/send"
+

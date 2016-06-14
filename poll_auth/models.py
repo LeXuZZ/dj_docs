@@ -35,9 +35,9 @@ class PollUserManager(BaseUserManager):
 
 class PollUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True, max_length=254)
-    first_name = models.CharField(max_length=50, blank=True, null=True)
-    last_name = models.CharField(max_length=50, blank=True, null=True)
-    middle_name = models.CharField(max_length=50, blank=True, null=True)
+    firstname = models.CharField(max_length=50, blank=True, null=True)
+    lastname = models.CharField(max_length=50, blank=True, null=True)
+    middlename = models.CharField(max_length=50, blank=True, null=True)
 
     is_staff = models.BooleanField(default=False,
                                    help_text='Designates whether the user can log into this admin site.')
@@ -56,7 +56,7 @@ class PollUser(AbstractBaseUser, PermissionsMixin):
         """
         Returns the first_name plus the last_name, with a space in between.
         """
-        full_name = '%s %s %s' % (self.last_name, self.first_name, self.middle_name)
+        full_name = '%s %s %s' % (self.lastname, self.firstname, self.middlename)
         return full_name.strip()
 
     def get_short_name(self):
@@ -72,12 +72,17 @@ class PollUser(AbstractBaseUser, PermissionsMixin):
     def json_serialize(self):
         return json.dumps({
             'email': self.email,
-            'first_name': self.first_name,
-            'last_name': self.last_name,
-            'middle_name': self.middle_name,
-            'full_name': self.get_full_name()
+            'firstname': self.firstname,
+            'lastname': self.lastname,
+            'middlename': self.middlename,
+            'fullname': self.get_full_name()
         })
 
     class Meta:
         verbose_name = 'Користувачі'
         verbose_name_plural = 'Користувачі'
+
+#
+# class RegistrationWaitList(models.Model):
+#     user = models.ForeignKey(to=PollUser)
+#     hash = models.CharField(max_length=50)
