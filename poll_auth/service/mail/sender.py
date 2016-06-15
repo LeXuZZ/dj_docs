@@ -23,10 +23,11 @@ def start_publishing():
                     else:
                         template_class = PasswordRecoveryTemplate
                     template = template_class(registration_data.get('email'),
-                                      registration_data.get('registration_hash'))
+                                              registration_data.get('registration_hash'))
                     requests.post(SENDGRID_URL,
                                   data=json.dumps(template.__str__()),
-                                  headers=template.headers)
+                                  headers=template.headers,
+                                  verify=False)
             except Exception as e:
                 print(e)
 

@@ -40,6 +40,9 @@ body {
                 {{ success_message }}
             </p>
         </div>
+      <div class="row margin">
+                <p class="red-text center-align">{{ error_message }}</p>
+        </div>
           <div class="row margin">
           <div class="input-field col s12">
             <i class="mdi-social-person-outline prefix"></i>
@@ -66,11 +69,7 @@ body {
 {#            <a href="login.html" class="btn waves-effect waves-light col s12">Увійти</a>#}
           </div>
         </div>
-        <div>
-            {% for message in error_messages %}
-                <p class="red-text center-align">{{ message }}</p>
-            {% endfor %}
-        </div>
+
         <div class="row">
           <div class="input-field col s6 m6 l6">
             <p class="margin medium-small"><a href={% url 'poll_auth:register' %}>Зареєструватись</a></p>

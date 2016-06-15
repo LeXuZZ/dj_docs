@@ -81,8 +81,3 @@ class PollUser(AbstractBaseUser, PermissionsMixin):
     class Meta:
         verbose_name = 'Користувачі'
         verbose_name_plural = 'Користувачі'
-
-#
-# class RegistrationWaitList(models.Model):
-#     user = models.ForeignKey(to=PollUser)
-#     hash = models.CharField(max_length=50)

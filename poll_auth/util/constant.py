@@ -4,8 +4,12 @@ class SuccessMessage:
 
 
 class ErrorMessage:
-    REGISTRATION_INVALID_HASH = "Ссылка не валидна"
+    REGISTRATION_INVALID_HASH = "Срок действия ссылки истек"
     REGISTRATION_USER_EXISTS = "Пользователь с таким почтовым адресом уже существует"
-    LOGIN_EMAIL_NULL = "Вы не указали почтовый адрес"
-    LOGIN_PASSWORD_NULL = "Вы не указали пароль"
-    LOGIN_NO_SUCH_USER = "Ошибка авторизации"
+    REGISTRATION_PASSWORD_NOT_MATCH = "Введенные пароли не совпадают"
+    REGISTRATION_BLANK_CREDENTIALS = "Все поля должны быть заполнены"
+    LOGIN_BLANK_CREDENTIALS = "Все поля должны быть заполнены"
+    LOGIN_EMAIL_BLANK = "Почтовый адрес не может быть пустым"
+    LOGIN_PASSWORD_BLANK = "Пароль не может быть пустым"
+    LOGIN_AUTHENTICATION_ERROR = "Не верно введена пара логин\пароль"
+    LOGIN_USER_IS_NOT_ACTIVE = "Пользователь не активен"
