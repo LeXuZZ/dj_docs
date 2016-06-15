@@ -1,6 +1,7 @@
 class SuccessMessage:
-    REGISTRATION_MAIL_SEND = "На почту отправлена ссылка для подтверждения регистрации"
+    REGISTRATION_MAIL_SENT = "На почту отправлена ссылка для подтверждения регистрации"
     REGISTRATION_SUCCESS = "Вы успешно зарегистрировались"
+    PASSWORD_RECOVERY_MAIL_SENT = "Новый пароль отправлен на почту"
 
 
 class ErrorMessage:
