@@ -1,4 +1,4 @@
-from dj_docs.settings import BASE_URL, SENDGRID_API_KEY
+from dj_docs.settings import BASE_URL
 
 
 class BaseTemplate:

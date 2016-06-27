@@ -1,5 +1,3 @@
-import json
-
 from django.contrib.auth import authenticate
 
 from poll_auth.models import PollUser

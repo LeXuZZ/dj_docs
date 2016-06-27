@@ -14,3 +14,4 @@ class ErrorMessage:
     LOGIN_PASSWORD_BLANK = "Пароль не может быть пустым"
     LOGIN_AUTHENTICATION_ERROR = "Не верно введена пара логин\пароль"
     LOGIN_USER_IS_NOT_ACTIVE = "Пользователь не активен"
+    RECOVERY_NO_SUCH_USER = "Такого пользователя не существует"

@@ -1,5 +1,4 @@
-import random
-import string
+import logging
 from django.contrib.auth import login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse
@@ -12,6 +11,14 @@ from poll_auth.util import constant
 from poll_auth.util.credentials import LoginCredentials, RegistrationCredentials, CredentialsValidationException
 from util.response import response_message
 from poll_auth.util.random_generator import generate_hash
+from django.db import transaction
+
+
+logger = logging.getLogger('DJ_DOCS_LOGGER')
+
+
+def debug_enabled():
+    return logger.isEnabledFor(10)
 
 
 class LoginView(View):
@@ -22,6 +29,8 @@ class LoginView(View):
         try:
             user = LoginCredentials(**{str(k): request.POST.get(k) for k in request.POST}).user
         except CredentialsValidationException as error_message:
+            if debug_enabled():
+                logger.debug('Login invalid. request.POST is: %s' % request.POST)
             return render(request, 'login.html', context={'error_message': error_message})
         login(request, user)
         return redirect("/")
@@ -52,27 +61,31 @@ class RegisterView(View):
         if not registration_hash:
             return render(request, 'register.html')
         try:
-            credentials = RegistrationCredentials(**json.loads(redis_instance.get(registration_hash).decode()))
+            registration_request = redis_instance.get(registration_hash)
+            credentials = RegistrationCredentials(**json.loads(registration_request.decode()))
         except AttributeError:
+            # no such hash in redis
             return render(request, 'register.html', context={
                 'error_message': constant.ErrorMessage.REGISTRATION_INVALID_HASH
             })
         except CredentialsValidationException as error_message:
-            return render(request, 'register.html', context={
-                'error_message': error_message
-            })
+            return render(request, 'register.html', context={'error_message': error_message})
         except Exception:
             return HttpResponse("404")
 
         user = PollUser(**credentials.poll_user_data())
         try:
-            user.set_password(credentials.password)
-            user.save()
-            redis_instance.delete(registration_hash)
-            return render(request, 'login.html', context={
-                'success_message': constant.SuccessMessage.REGISTRATION_SUCCESS
-            })
+            with transaction.atomic():
+                user.set_password(credentials.password)
+                user.save()
+                redis_instance.delete(registration_hash)
+                return render(request, 'login.html', context={
+                    'success_message': constant.SuccessMessage.REGISTRATION_SUCCESS
+                })
         except IntegrityError:
+            # if something went wrong on DB side - put redis data back
+            # todo: expiration time must not "reset" to 1 day again
+            redis_instance.setex(registration_hash, REGISTRATION_EXPIRATION_TIME, registration_request)
             return render(request, 'register.html', context={
                 'error_message': constant.ErrorMessage.REGISTRATION_USER_EXISTS
             })
@@ -82,14 +95,23 @@ class PasswordRecoveryView(View):
     def get(self, request, recovery_hash=None):
         if not recovery_hash:
             return render(request, 'password-recovery.html')
-        credentials = json.loads(redis_instance.get(recovery_hash).decode())
+        password_recovery_request = redis_instance.get(recovery_hash)
+        credentials = json.loads(password_recovery_request.decode())
         try:
             user = PollUser.objects.get(email=credentials.get('email'))
-        except Exception as e:
-            print(e)
-        user.set_password(credentials.get('password'))
-        user.save()
-        return render(request, 'login.html', context={'success_message': 'successfully changed'})
+        except PollUser.DoesNotExist:
+            return render(request, 'password-recovery.html', context={
+                'error_message': constant.ErrorMessage.RECOVERY_NO_SUCH_USER
+            })
+        try:
+            with transaction.atomic():
+                user.set_password(credentials.get('password'))
+                redis_instance.delete(recovery_hash)
+                user.save()
+            return render(request, 'login.html', context={'success_message': 'successfully changed'})
+        except IntegrityError:
+            redis_instance.setex(recovery_hash, REGISTRATION_EXPIRATION_TIME, password_recovery_request)
+            return HttpResponse("404")
 
     def post(self, request):
         recovery_hash = generate_hash(50)

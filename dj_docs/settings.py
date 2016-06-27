@@ -113,10 +113,9 @@ TEMPLATES = [
 
 X_FRAME_OPTIONS = 'DENY'
 
-REGISTRATION_EXPIRATION_TIME = 60 * 60 * 24 # 1 day
+REGISTRATION_EXPIRATION_TIME = 60 * 60 * 24  # 1 day
 
 AUTH_USER_MODEL = 'poll_auth.PollUser'
-
 
 AUTHENTICATION_BACKENDS = (
     'poll_auth.backends.PollAuthBackend',
@@ -126,13 +125,13 @@ AUTHENTICATION_BACKENDS = (
 # Check redis
 try:
     from redis.exceptions import ConnectionError
+
     redis_instance.set("dummy", "dummy")
 except ConnectionError:
     from django.core.exceptions import ImproperlyConfigured
-    raise ImproperlyConfigured("Redis is not available")
 
+    raise ImproperlyConfigured("Redis is not available")
 
 SENDGRID_API_KEY = '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'
 
 SENDGRID_URL = "https://api.sendgrid.com/v3/mail/send"
-
