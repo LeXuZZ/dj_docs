@@ -31,8 +31,6 @@ if DEBUG:
 else:
     from dj_docs.settings_prod import *
 
-ALLOWED_HOSTS = []
-
 # Application definition
 
 INSTALLED_APPS = (
