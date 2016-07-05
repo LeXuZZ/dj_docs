@@ -1,18 +1,19 @@
 import logging
+
 from django.contrib.auth import login, logout
 from django.db import IntegrityError
+from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views.generic import View
-from poll_auth.models import *
+
 from dj_docs.settings import redis_instance, REGISTRATION_EXPIRATION_TIME
+from poll_auth.models import *
 from poll_auth.service.mail.templates import RegistrationConfirmationTemplate, PasswordRecoveryTemplate
 from poll_auth.util import constant
 from poll_auth.util.credentials import LoginCredentials, RegistrationCredentials, CredentialsValidationException
-from util.response import response_message
 from poll_auth.util.random_generator import generate_hash
-from django.db import transaction
-
+from util.response import response_message
 
 logger = logging.getLogger('DJ_DOCS_LOGGER')
 
@@ -23,14 +24,16 @@ def debug_enabled():
 
 class LoginView(View):
     def get(self, request):
+        logger.debug('LoginView. GET request')
         return render(request, 'login.html')
 
     def post(self, request):
+        logger.debug('LoginView. POST request')
         try:
             user = LoginCredentials(**{str(k): request.POST.get(k) for k in request.POST}).user
+            logger.debug('%s. user=%s' % self.__class__, user)
         except CredentialsValidationException as error_message:
-            if debug_enabled():
-                logger.debug('Login invalid. request.POST is: %s' % request.POST)
+            logger.warn('Login invalid. request.POST is: %s' % request.POST)
             return render(request, 'login.html', context={'error_message': error_message})
         login(request, user)
         return redirect("/")
