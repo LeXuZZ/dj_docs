@@ -33,7 +33,7 @@ class LoginView(View):
             user = LoginCredentials(**{str(k): request.POST.get(k) for k in request.POST}).user
             logger.debug('LoginView. user=%s', user)
         except CredentialsValidationException as error_message:
-            logger.warn('Login invalid. request.POST is: %s' % request.POST)
+            logger.warn('Login invalid. request.POST is: %s', request.POST)
             return render(request, 'login.html', context={'error_message': error_message})
         login(request, user)
         logger.debug('LoginView. Login succeed')
