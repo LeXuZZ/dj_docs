@@ -28,7 +28,7 @@ class LoginView(View):
         return render(request, 'login.html')
 
     def post(self, request):
-        logger.debug('LoginView. POST request. POST data = %', request.POST)
+        logger.debug('LoginView. POST request. POST data = %s', request.POST)
         try:
             user = LoginCredentials(**{str(k): request.POST.get(k) for k in request.POST}).user
             logger.debug('LoginView. user=%s', user)
