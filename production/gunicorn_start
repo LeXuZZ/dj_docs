@@ -5,7 +5,7 @@ DJANGODIR=/home/djdocs/dj_docs                    # Django project directory
 SOCKFILE=$DJANGODIR/run/gunicorn.sock             # we will communicte using this unix socket
 LOGDIR=$DJANGODIR/log
 USER=root                                         # the user to run as
-NUM_WORKERS=2                                     # how many worker processes should Gunicorn spawn
+NUM_WORKERS=3                                     # how many worker processes should Gunicorn spawn
 DJANGO_WSGI_MODULE=dj_docs.wsgi                   # WSGI module name
 
 echo "Starting $NAME as `whoami`"
