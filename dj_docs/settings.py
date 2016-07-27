@@ -13,9 +13,9 @@ import os
 from os.path import abspath, basename, dirname, join, normpath
 
 BASE_DIR = dirname(dirname(__file__))
-DJANGO_ROOT = dirname(dirname(abspath(__file__)))
-SITE_ROOT = dirname(DJANGO_ROOT)
-SITE_NAME = basename(DJANGO_ROOT)
+
+if not os.path.isdir(os.path.join(BASE_DIR, 'log')):
+    os.makedirs(os.path.join(BASE_DIR, 'log'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
@@ -77,7 +77,7 @@ STATICFILES_DIRS = (
 )
 
 STATIC_URL = '/static/'
-STATIC_ROOT = normpath(join(SITE_ROOT, 'static'))
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # Configure templates
 TEMPLATES = [
@@ -123,3 +123,7 @@ except ConnectionError:
 SENDGRID_API_KEY = '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'
 
 SENDGRID_URL = "https://api.sendgrid.com/v3/mail/send"
+
+REGISTRATION_HASH_LENGTH = 50
+
+RECOVERY_PASSWORD_LENGTH = 10

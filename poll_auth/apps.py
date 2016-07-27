@@ -1,5 +1,5 @@
 from django.apps import AppConfig
-from poll_auth.service.mail.sender import start_publishing
+from poll_auth.service.mail.sender import email_sender
 
 
 class AuthConfig(AppConfig):
@@ -7,4 +7,4 @@ class AuthConfig(AppConfig):
 
     def ready(self):
         super().ready()
-        start_publishing()
+        email_sender()

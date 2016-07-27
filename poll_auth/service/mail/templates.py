@@ -57,4 +57,3 @@ class PasswordRecoveryTemplate(BaseTemplate):
             self.new_password,
             BASE_URL + "auth/password_recovery/" + self.hash
         )
-

@@ -7,19 +7,16 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views.generic import View
 
-from dj_docs.settings import redis_instance, REGISTRATION_EXPIRATION_TIME
+from dj_docs.settings import redis_instance, REGISTRATION_EXPIRATION_TIME, REGISTRATION_HASH_LENGTH, \
+    RECOVERY_PASSWORD_LENGTH
 from poll_auth.models import *
 from poll_auth.service.mail.templates import RegistrationConfirmationTemplate, PasswordRecoveryTemplate
 from poll_auth.util import constant
 from poll_auth.util.credentials import LoginCredentials, RegistrationCredentials, CredentialsValidationException
-from poll_auth.util.random_generator import generate_hash
+from poll_auth.util.helpers import generate_hash
 from util.response import response_message
 
 logger = logging.getLogger('DJ_DOCS_LOGGER')
-
-
-def debug_enabled():
-    return logger.isEnabledFor(10)
 
 
 class LoginView(View):
@@ -47,7 +44,7 @@ class RegisterView(View):
         except CredentialsValidationException as error_message:
             return render(request, 'register.html', {'error_message': error_message})
 
-        registration_hash = generate_hash(50)
+        registration_hash = generate_hash(REGISTRATION_HASH_LENGTH)
 
         redis_instance.setex(registration_hash, REGISTRATION_EXPIRATION_TIME, json.dumps(request.POST))
         redis_instance.publish('email_send_channel',
@@ -56,7 +53,7 @@ class RegisterView(View):
                                        to=credentials.email, hash=registration_hash
                                    ).sendgrid_dump()
                                )
-                           )
+                               )
         return render(request, 'login.html', context={
             'success_message': constant.SuccessMessage.REGISTRATION_MAIL_SENT
         })
@@ -118,8 +115,8 @@ class PasswordRecoveryView(View):
             return HttpResponse("404")
 
     def post(self, request):
-        recovery_hash = generate_hash(50)
-        new_password = generate_hash(10)
+        recovery_hash = generate_hash(REGISTRATION_HASH_LENGTH)
+        new_password = generate_hash(RECOVERY_PASSWORD_LENGTH)
         redis_instance.setex(recovery_hash, REGISTRATION_EXPIRATION_TIME, json.dumps(
             {'email': request.POST.get('email'),
              'password': new_password}
@@ -130,10 +127,9 @@ class PasswordRecoveryView(View):
                                        to=request.POST.get('email'),
                                        hash=recovery_hash,
                                        new_password=new_password
-                                   ).sendgrid_dump()
-                               )
-                           )
-        return render(request, 'login.html', context={'success_message': constant.SuccessMessage.PASSWORD_RECOVERY_MAIL_SENT})
+                                   ).sendgrid_dump()))
+        return render(request, 'login.html',
+                      context={'success_message': constant.SuccessMessage.PASSWORD_RECOVERY_MAIL_SENT})
 
 
 class LogoutView(View):

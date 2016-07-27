@@ -1,7 +1,6 @@
 redis==2.10.5
-aiosmtplib
 django
-asyncio_redis
 psycopg2
-aiohttp
 requests
+lxml
+docxtpl

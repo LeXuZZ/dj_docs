@@ -93,7 +93,8 @@ class RegistrationCredentials:
     @password_confirmation.setter
     def password_confirmation(self, pc):
         if not pc: raise CredentialsValidationException(constant.ErrorMessage.REGISTRATION_BLANK_CREDENTIALS)
-        if not pc == self._password: raise CredentialsValidationException(constant.ErrorMessage.REGISTRATION_PASSWORD_NOT_MATCH)
+        if not pc == self._password: raise CredentialsValidationException(
+            constant.ErrorMessage.REGISTRATION_PASSWORD_NOT_MATCH)
         self._password_confirmation = pc
 
     @firstname.setter
@@ -119,6 +120,3 @@ class RegistrationCredentials:
             'middlename': self.middlename,
             'password': self.password,
         }
-
-    def redis_data(self, registration_hash=None):
-        return {**self.poll_user_data(), **{'registration_hash': registration_hash, 'service': 'registration'}}
