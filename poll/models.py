@@ -5,22 +5,34 @@ from dj_docs.settings import redis_instance
 from poll_auth.models import PollUser
 
 
+class PollManager(models.Manager):
+
+    def json_serialize_all(self):
+        return json.dumps([poll.dict_serialize() for poll in self.objects.all()])
+
+
 class Template(models.Model):
     name = models.CharField(max_length=255)
     template = models.FileField(upload_to='poll/template_files/docx/')
 
 
 class Poll(models.Model):
+
+    objects = PollManager()
+
     name = models.CharField(max_length=255)
     json = models.TextField()
     templates = models.ForeignKey(to=Template)
 
-    def json_serialize(self):
-        return json.dumps({
+    def dict_serialize(self):
+        return {
             'name': self.name,
             'json': self.json,
             'templates': [t for t in self.templates.all()]
-        })
+        }
+
+    def json_serialize(self):
+        return json.dumps(self.dict_serialize())
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):

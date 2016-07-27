@@ -1,5 +1,5 @@
-import platform
 import logging
+import platform
 
 if platform.system() == 'Windows':
     from threading import Thread as Process
@@ -43,4 +43,19 @@ class redis_subscribe:
             process.daemon = True
             process.start()
 
+        return wrapper
+
+
+class log_request:
+
+    def __init__(self, logger):
+        self.logger = logger
+
+    def __call__(self, func):
+        def wrapper(request, *args, **kwargs):
+            session_key = request.session.session_key
+            self.logger.info("%s. %s. START" % (func.__name__, session_key))
+            self.logger.debug('%s. %s. request: %s. request.POST: %s. request.GET: %s'
+                              % (func.__name__, session_key, request, request.POST, request.GET))
+            return func(request, *args, **kwargs)
         return wrapper

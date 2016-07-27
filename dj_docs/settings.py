@@ -110,6 +110,10 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend'
 )
 
+LOGIN_URL = '/auth/login/'
+
+LOGIN_REDIRECT_URL = '/'
+
 # Check redis
 try:
     from redis.exceptions import ConnectionError

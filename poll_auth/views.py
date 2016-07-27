@@ -1,6 +1,7 @@
 import logging
 
 from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.db import transaction
 from django.http import HttpResponse
@@ -14,12 +15,16 @@ from poll_auth.service.mail.templates import RegistrationConfirmationTemplate, P
 from poll_auth.util import constant
 from poll_auth.util.credentials import LoginCredentials, RegistrationCredentials, CredentialsValidationException
 from poll_auth.util.helpers import generate_hash
+from util.decorators import log_request
 from util.response import response_message
 
 logger = logging.getLogger('DJ_DOCS_LOGGER')
+common_decorators = [login_required, log_request]
+
 
 
 class LoginView(View):
+
     def get(self, request):
         logger.debug('LoginView. GET request')
         return render(request, 'login.html')
