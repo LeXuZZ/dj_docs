@@ -1,4 +1,3 @@
-import logging
 from django.db import IntegrityError
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -6,33 +5,31 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import View
 from poll.models import *
 from util.response import response_message
-
-
-logger = logging.getLogger("DJ_DOCS")
+from dj_docs.settings import logger
 
 
 @ensure_csrf_cookie
 def get_csrf(request):
-    return HttpResponse("")
+    return HttpResponse(status_code=200)
 
 
 class IndexView(View):
-
     def get(self, request):
+        logger.debug("IndexView GET")
         return render(request, 'index.html')
 
 
 class PollView(View):
-
     def get(self, request, pk=None):
-        if pk:
-            try:
-                poll = Poll.objects.get(pk=pk)
-                return response_message(success=True, data=poll.json_serialize())
-            except Poll.DoesNotExist:
-                return response_message(success=False, error=True, text='no such poll')
-
-        return response_message(success=True, data=Poll.objects.json_serialize_all())
+        if not pk:
+            logger.debug("PollView GET.")
+            return response_message(success=True, data=Poll.objects.json_serialize_all())
+        try:
+            poll = Poll.objects.get(pk=pk)
+            return response_message(success=True, data=poll.json_serialize())
+        except Poll.DoesNotExist:
+            logger.debug("PollView GET. Requested Poll object Does Not Exists. pk=%d" % pk)
+            return response_message(success=False, error=True, text='no such poll')
 
     def post(self, request, pk):
         user = request.user

@@ -9,7 +9,7 @@ from django.shortcuts import render, redirect
 from django.views.generic import View
 
 from dj_docs.settings import redis_session, REGISTRATION_EXPIRATION_TIME, REGISTRATION_HASH_LENGTH, \
-    RECOVERY_PASSWORD_LENGTH
+    RECOVERY_PASSWORD_LENGTH, APPLICATION_UUID
 from poll_auth.models import *
 from poll_auth.util import constant
 from poll_auth.util.credentials import LoginCredentials, RegistrationCredentials, CredentialsValidationException
@@ -43,7 +43,7 @@ class RegisterView(View):
             credentials = RegistrationCredentials(**{str(k): request.POST.get(k) for k in request.POST})
             logger.debug('RegisterView POST. credentials: %s' % credentials)
         except CredentialsValidationException as error_message:
-            logger.debug('RegisterView POST. credentials invalid: %s' % credentials)
+            logger.debug('RegisterView POST. credentials invalid: %s' % request.POST)
             return render(request, 'register.html', {'error_message': error_message})
 
         registration_hash = generate_hash(REGISTRATION_HASH_LENGTH)
@@ -52,9 +52,9 @@ class RegisterView(View):
         redis_session.setex(registration_hash, REGISTRATION_EXPIRATION_TIME, json.dumps(request.POST))
         redis_session.publish('email_send_channel',
                               json.dumps(
-                                  RegistrationConfirmationTemplate(
-                                      to=credentials.email, hash=registration_hash
-                                  ).sendgrid_dump()
+                                  {'template': RegistrationConfirmationTemplate(
+                                      to=credentials.email, hash=registration_hash).sendgrid_dump(),
+                                   'application_id': APPLICATION_UUID}
                               )
                               )
         logger.debug('RegisterView POST. credentials dispatched')
@@ -140,12 +140,13 @@ class PasswordRecoveryView(View):
                 {'email': request.POST.get('email'),
                  'password': new_password}
             ))
-            redis_session.publish('email_send_channel', json.dumps(
-                PasswordRecoveryTemplate(
-                    to=request.POST.get('email'),
-                    hash=recovery_hash,
-                    new_password=new_password
-                ).sendgrid_dump()))
+            redis_session.publish('email_send_channel',
+                                  json.dumps({
+                                      'template': PasswordRecoveryTemplate(
+                                          to=request.POST.get('email'),
+                                          hash=recovery_hash,
+                                          new_password=new_password).sendgrid_dump(),
+                                      'application_id': APPLICATION_UUID}))
         except ConnectionError as e:
             logger.error('PasswordRecoveryView POST. Cannot connect to Redis. ', e)
             return HttpResponse(status_code=400)

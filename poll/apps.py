@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
-from poll.service import document_creator
+from service.subscribers import document_creator
 
 
 class PollConfig(AppConfig):

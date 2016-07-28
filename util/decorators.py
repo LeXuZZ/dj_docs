@@ -33,14 +33,13 @@ class redis_subscribe:
             for raw_message in pubsub.listen():
                 try:
                     if raw_message['type'] == 'message':
-                        logger.debug(
-                            'received new message on channel: %s. message: %s' % (self.channel_name, raw_message))
                         try:
-                            message = json.loads(raw_message.get('data'))
+                            message = json.loads(raw_message.get('data').decode())
                         except ValueError:
                             logger.warn("%s. %s. Cannot load message" % (APPLICATION_UUID, func.__name__))
                             continue
                         if message.get('application_id') == APPLICATION_UUID:
+                            logger.debug('received new message on channel: %s. message: %s' % (self.channel_name, raw_message))
                             func(message)
                 except Exception as e:
                     logger.error(e)

@@ -1,7 +1,7 @@
 import json
 from django.db import models
 
-from dj_docs.settings import redis_session
+from dj_docs.settings import redis_session, APPLICATION_UUID
 from poll_auth.models import PollUser
 
 
@@ -59,7 +59,7 @@ class PollResult(models.Model):
 
     def save(self, *args, **kwargs):
         #  send id of finished poll to document creator service
-        redis_session.publish("document_creator_channel", self.pk)
+        redis_session.publish("document_creator_channel", json.dumps({'pk': self.pk, 'application_id': APPLICATION_UUID}))
         super().save(*args, **kwargs)
 
     def __str__(self):
