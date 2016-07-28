@@ -18,18 +18,24 @@ DATABASES = {
     }
 }
 
-redis_instance = redis.Redis(unix_socket_path='/var/run/redis/redis.sock')
+redis_session = redis.Redis(unix_socket_path='/var/run/redis/redis.sock')
 
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': True,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '[%(asctime)s - %(name)s - %(levelname)s] - %(message)s'
+        }
+    },
     'handlers': {
         'file': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-            'formatter': 'precise',
+            'formatter': 'simple',
             'filename': 'log/dj_docs.log',
-            'maxBytes': 1024 * 1024 * 10  # 10 mb
+            'maxBytes': 1024 * 1024 * 10,  # 10 mb
+            'backupCount': 10
         },
     },
     'loggers': {
@@ -39,10 +45,4 @@ LOGGING = {
             'propagate': True,
         },
     },
-    'formatters': {
-        'precise': {
-            'format': '%(asctime)s %(levelname)-8s %(name)-15s %(message)s',
-            'datefmt': '%Y-%m-%d %H:%M:%S'
-        }
-    }
 }

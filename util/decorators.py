@@ -1,13 +1,11 @@
-import logging
+import json
 import platform
+from dj_docs.settings import APPLICATION_UUID, logger
 
 if platform.system() == 'Windows':
     from threading import Thread as Process
 else:
     from multiprocessing import Process as Process
-
-
-logger = logging.getLogger('DJ_DOCS')
 
 
 class redis_subscribe:
@@ -24,6 +22,7 @@ class redis_subscribe:
         '''
         self.redis_session = redis_session
         self.channel_name = channel_name
+        logger.debug('create redis listener on channel: %s' % self.channel_name)
 
     def __call__(self, func):
 
@@ -34,7 +33,15 @@ class redis_subscribe:
             for raw_message in pubsub.listen():
                 try:
                     if raw_message['type'] == 'message':
-                        func(raw_message['data'])
+                        logger.debug(
+                            'received new message on channel: %s. message: %s' % (self.channel_name, raw_message))
+                        try:
+                            message = json.loads(raw_message.get('data'))
+                        except ValueError:
+                            logger.warn("%s. %s. Cannot load message" % (APPLICATION_UUID, func.__name__))
+                            continue
+                        if message.get('application_id') == APPLICATION_UUID:
+                            func(message)
                 except Exception as e:
                     logger.error(e)
 
@@ -47,15 +54,15 @@ class redis_subscribe:
 
 
 class log_request:
-
     def __init__(self, logger):
         self.logger = logger
 
     def __call__(self, func):
         def wrapper(request, *args, **kwargs):
             session_key = request.session.session_key
-            self.logger.info("%s. %s. START" % (func.__name__, session_key))
-            self.logger.debug('%s. %s. request: %s. request.POST: %s. request.GET: %s'
-                              % (func.__name__, session_key, request, request.POST, request.GET))
+            self.logger.info("%s. %s. %s. START" % (APPLICATION_UUID, func.__name__, session_key))
+            self.logger.debug('%s. %s. %s. request: %s. request.POST: %s. request.GET: %s'
+                              % (APPLICATION_UUID, func.__name__, session_key, request, request.POST, request.GET))
             return func(request, *args, **kwargs)
+
         return wrapper

@@ -25,31 +25,37 @@ REDIS_CONFIG = {
     'db': 0
 }
 
-redis_instance = redis.StrictRedis(**REDIS_CONFIG)
+redis_session = redis.StrictRedis(**REDIS_CONFIG)
 
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': True,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '[%(asctime)s - %(name)s - %(levelname)s %(APPLICATION_UUID)s ] - %(message)s'
+        }
+    },
     'handlers': {
         'file': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-            'formatter': 'precise',
+            'formatter': 'simple',
             'filename': 'log/dj_docs.log',
-            'maxBytes': 1024 * 1024 * 10  # 10 mb
+            'maxBytes': 1024 * 1024 * 10,  # 10 mb
+            'backupCount': 10,
+            'filters': ['application_id_filter']
         },
     },
+    'filters': {
+        'application_id_filter': {
+            '()': 'util.logging.filter.ApplicationUUIDFilter'
+        }
+    },
     'loggers': {
-        'DJ_DOCS_LOGGER': {
+        'DJ_DOCS': {
             'handlers': ['file'],
             'level': 'DEBUG',
             'propagate': True,
         },
     },
-    'formatters': {
-        'precise': {
-            'format': '%(asctime)s %(levelname)-8s %(name)-15s %(message)s',
-            'datefmt': '%Y-%m-%d %H:%M:%S'
-        }
-    }
 }

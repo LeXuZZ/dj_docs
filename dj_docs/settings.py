@@ -10,6 +10,8 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import logging
+import uuid
 from os.path import abspath, basename, dirname, join, normpath
 
 BASE_DIR = dirname(dirname(__file__))
@@ -117,8 +119,7 @@ LOGIN_REDIRECT_URL = '/'
 # Check redis
 try:
     from redis.exceptions import ConnectionError
-
-    redis_instance.set("dummy", "dummy")
+    redis_session.set("dummy", "dummy")
 except ConnectionError:
     from django.core.exceptions import ImproperlyConfigured
 
@@ -131,3 +132,7 @@ SENDGRID_URL = "https://api.sendgrid.com/v3/mail/send"
 REGISTRATION_HASH_LENGTH = 50
 
 RECOVERY_PASSWORD_LENGTH = 10
+
+logger = logging.getLogger('DJ_DOCS')
+
+APPLICATION_UUID = uuid.uuid4().__str__()

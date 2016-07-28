@@ -1,15 +1,11 @@
-import logging
-
-from dj_docs.settings import redis_instance
+from dj_docs.settings import redis_session, logger
 from poll.models import PollResult
 from docxtpl import DocxTemplate
 
 from util.decorators import redis_subscribe
 
-logger = logging.getLogger('DJ_DOCS')
 
-
-@redis_subscribe(redis_instance, 'document_creator_channel')
+@redis_subscribe(redis_session, 'document_creator_channel')
 def document_creator(pk):
     try:
         pk = int(pk.decode())
